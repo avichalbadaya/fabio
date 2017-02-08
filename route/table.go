@@ -3,7 +3,7 @@ package route
 import (
 	"errors"
 	"fmt"
-	"log"
+	"github.com/eBay/fabio/logging"
 	"net/http"
 	"net/url"
 	"sort"
@@ -44,7 +44,7 @@ var mu sync.Mutex
 // to be called from multiple goroutines.
 func SetTable(t Table) {
 	if t == nil {
-		log.Print("[WARN] Ignoring nil routing table")
+		logging.Warn("[WARN] Ignoring nil routing table")
 		return
 	}
 	mu.Lock()
@@ -80,7 +80,7 @@ func syncRegistry(t Table) {
 	for name, active := range timers {
 		if !active {
 			ServiceRegistry.Unregister(name)
-			log.Printf("[INFO] Unregistered timer %s", name)
+			logging.Info("[INFO] Unregistered timer %s", name)
 		}
 	}
 }
@@ -288,7 +288,7 @@ func (t Table) Lookup(req *http.Request, trace string) *Target {
 		if len(trace) > 16 {
 			trace = trace[:15]
 		}
-		log.Printf("[TRACE] %s Tracing %s%s", trace, req.Host, path)
+		logging.Trace("[TRACE] %s Tracing %s%s", trace, req.Host, path)
 	}
 
 	target := t.lookup(normalizeHost(req), path, trace)
@@ -297,7 +297,7 @@ func (t Table) Lookup(req *http.Request, trace string) *Target {
 	}
 
 	if target != nil && trace != "" {
-		log.Printf("[TRACE] %s Routing to service %s on %s", trace, target.Service, target.URL)
+		logging.Trace("[TRACE] %s Routing to service %s on %s", trace, target.Service, target.URL)
 	}
 
 	return target
@@ -322,12 +322,12 @@ func (t Table) lookup(host, path, trace string) *Target {
 				target = pick(r)
 			}
 			if trace != "" {
-				log.Printf("[TRACE] %s Match %s%s", trace, r.Host, r.Path)
+				logging.Trace("[TRACE] %s Match %s%s", trace, r.Host, r.Path)
 			}
 			return target
 		}
 		if trace != "" {
-			log.Printf("[TRACE] %s No match %s%s", trace, r.Host, r.Path)
+			logging.Trace("[TRACE] %s No match %s%s", trace, r.Host, r.Path)
 		}
 	}
 	return nil

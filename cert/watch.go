@@ -2,7 +2,7 @@ package cert
 
 import (
 	"crypto/tls"
-	"log"
+	"github.com/eBay/fabio/logging"
 	"reflect"
 	"time"
 )
@@ -20,7 +20,7 @@ func watch(ch chan []tls.Certificate, refresh time.Duration, path string, loadFn
 	for {
 		next, err := loadFn(path)
 		if err != nil {
-			log.Printf("[ERROR] cert: Cannot load certificates from %s. %s", path, err)
+			logging.Error("[ERROR] cert: Cannot load certificates from %s. %s", path, err)
 			time.Sleep(refresh)
 			continue
 		}
@@ -32,7 +32,7 @@ func watch(ch chan []tls.Certificate, refresh time.Duration, path string, loadFn
 
 		certs, err := loadCertificates(next)
 		if err != nil {
-			log.Printf("[ERROR] cert: Cannot make certificates: %s", err)
+			logging.Error("[ERROR] cert: Cannot make certificates: %s", err)
 			continue
 		}
 

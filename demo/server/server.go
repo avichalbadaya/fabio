@@ -86,7 +86,7 @@ func main() {
 
 	// start http server
 	go func() {
-		log.Printf("Listening on %s serving %s", addr, prefix)
+		logging.Info("Listening on %s serving %s", addr, prefix)
 
 		var err error
 		if certFile != "" {
@@ -151,7 +151,7 @@ func main() {
 	if err := client.Agent().ServiceRegister(service); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Registered service %q in consul with tags %q", name, strings.Join(tags, ","))
+	logging.Info("Registered service %q in consul with tags %q", name, strings.Join(tags, ","))
 
 	// run until we get a signal
 	quit := make(chan os.Signal, 1)
@@ -162,14 +162,14 @@ func main() {
 	if err := client.Agent().ServiceDeregister(serviceID); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Deregistered service %q in consul", name)
+	logging.Info("Deregistered service %q in consul", name)
 }
 
 func EchoServer(ws *websocket.Conn) {
 	addr := ws.LocalAddr().String()
 	pfx := []byte("[" + addr + "] ")
 
-	log.Printf("ws connect on %s", addr)
+	logging.Info("ws connect on %s", addr)
 
 	// the following could be done with io.Copy(ws, ws)
 	// but I want to add some meta data
@@ -177,14 +177,14 @@ func EchoServer(ws *websocket.Conn) {
 	for {
 		n, err := ws.Read(msg)
 		if err != nil && err != io.EOF {
-			log.Printf("ws error on %s. %s", addr, err)
+			logging.Error("ws error on %s. %s", addr, err)
 			break
 		}
 		_, err = ws.Write(append(pfx, msg[:n]...))
 		if err != nil && err != io.EOF {
-			log.Printf("ws error on %s. %s", addr, err)
+			logging.Error("ws error on %s. %s", addr, err)
 			break
 		}
 	}
-	log.Printf("ws disconnect on %s", addr)
+	logging.Info("ws disconnect on %s", addr)
 }
