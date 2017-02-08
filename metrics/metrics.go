@@ -8,7 +8,7 @@ package metrics
 import (
 	"bytes"
 	"fmt"
-	"github.com/eBay/fabio/mdllog"
+	"github.com/eBay/fabio/logging"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -55,15 +55,15 @@ func NewRegistry(cfg config.Metrics) (r Registry, err error) {
 
 	switch cfg.Target {
 	case "stdout":
-		mdllog.Info.Printf("[INFO] Sending metrics to stdout")
+		logging.Info("[INFO] Sending metrics to stdout")
 		return gmStdoutRegistry(cfg.Interval)
 
 	case "graphite":
-		mdllog.Info.Printf("[INFO] Sending metrics to Graphite on %s as %q", cfg.GraphiteAddr, prefix)
+		logging.Info("[INFO] Sending metrics to Graphite on %s as %q", cfg.GraphiteAddr, prefix)
 		return gmGraphiteRegistry(prefix, cfg.GraphiteAddr, cfg.Interval)
 
 	case "statsd":
-		mdllog.Info.Printf("[INFO] Sending metrics to StatsD on %s as %q", cfg.StatsDAddr, prefix)
+		logging.Info("[INFO] Sending metrics to StatsD on %s as %q", cfg.StatsDAddr, prefix)
 		return gmStatsDRegistry(prefix, cfg.StatsDAddr, cfg.Interval)
 
 	case "circonus":

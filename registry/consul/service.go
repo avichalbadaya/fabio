@@ -2,7 +2,7 @@ package consul
 
 import (
 	"fmt"
-	"github.com/eBay/fabio/mdllog"
+	"github.com/eBay/fabio/logging"
 	"net"
 	"runtime"
 	"sort"
@@ -22,12 +22,12 @@ func watchServices(client *api.Client, tagPrefix string, status []string, config
 		q := &api.QueryOptions{RequireConsistent: true, WaitIndex: lastIndex}
 		checks, meta, err := client.Health().State("any", q)
 		if err != nil {
-			mdllog.Warning.Printf("[WARN] consul: Error fetching health state. %v", err)
+			logging.Warn("[WARN] consul: Error fetching health state. %v", err)
 			time.Sleep(time.Second)
 			continue
 		}
 
-		mdllog.Info.Printf("[INFO] consul: Health changed to #%d", meta.LastIndex)
+		logging.Info("[INFO] consul: Health changed to #%d", meta.LastIndex)
 		config <- servicesConfig(client, passingServices(checks, status), tagPrefix)
 		lastIndex = meta.LastIndex
 	}
@@ -67,14 +67,14 @@ func serviceConfig(client *api.Client, name string, passing map[string]bool, tag
 
 	dc, err := datacenter(client)
 	if err != nil {
-		mdllog.Warning.Printf("[WARN] consul: Error getting datacenter. %s", err)
+		logging.Warn("[WARN] consul: Error getting datacenter. %s", err)
 		return nil
 	}
 
 	q := &api.QueryOptions{RequireConsistent: true}
 	svcs, _, err := client.Catalog().Service(name, "", q)
 	if err != nil {
-		mdllog.Warning.Printf("[WARN] consul: Error getting catalog service %s. %v", name, err)
+		logging.Warn("[WARN] consul: Error getting catalog service %s. %v", name, err)
 		return nil
 	}
 

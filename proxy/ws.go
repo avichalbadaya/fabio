@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"io"
-	"github.com/eBay/fabio/mdllog"
+	"github.com/eBay/fabio/logging"
 	"net/http"
 	"net/url"
 
@@ -21,7 +21,7 @@ func newWSProxy(t *url.URL) http.Handler {
 		targetURL := "ws://" + t.Host + r.RequestURI
 		out, err := websocket.Dial(targetURL, "", r.Header.Get("Origin"))
 		if err != nil {
-			mdllog.Info.Printf("[INFO] WS error for %s. %s", r.URL, err)
+			logging.Info("[INFO] WS error for %s. %s", r.URL, err)
 			return
 		}
 		defer out.Close()
@@ -36,7 +36,7 @@ func newWSProxy(t *url.URL) http.Handler {
 		go cp(in, out)
 		err = <-errc
 		if err != nil && err != io.EOF {
-			mdllog.Info.Printf("[INFO] WS error for %s. %s", r.URL, err)
+			logging.Info("[INFO] WS error for %s. %s", r.URL, err)
 		}
 	})
 }

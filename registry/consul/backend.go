@@ -2,7 +2,7 @@ package consul
 
 import (
 	"errors"
-	"github.com/eBay/fabio/mdllog"
+	"github.com/eBay/fabio/logging"
 
 	"github.com/eBay/fabio/config"
 	"github.com/eBay/fabio/registry"
@@ -32,13 +32,13 @@ func NewBackend(cfg *config.Consul) (registry.Backend, error) {
 	}
 
 	// we're good
-	mdllog.Info.Printf("[INFO] consul: Connecting to %q in datacenter %q", cfg.Addr, dc)
+	logging.Info("[INFO] consul: Connecting to %q in datacenter %q", cfg.Addr, dc)
 	return &be{c: c, dc: dc, cfg: cfg}, nil
 }
 
 func (b *be) Register() error {
 	if !b.cfg.Register {
-		mdllog.Info.Printf("[INFO] consul: Not registering fabio in consul")
+		logging.Info("[INFO] consul: Not registering fabio in consul")
 		return nil
 	}
 
@@ -76,8 +76,8 @@ func (b *be) WriteManual(value string, version uint64) (ok bool, err error) {
 }
 
 func (b *be) WatchServices() chan string {
-	mdllog.Info.Printf("[INFO] consul: Using dynamic routes")
-	mdllog.Info.Printf("[INFO] consul: Using tag prefix %q", b.cfg.TagPrefix)
+	logging.Info("[INFO] consul: Using dynamic routes")
+	logging.Info("[INFO] consul: Using tag prefix %q", b.cfg.TagPrefix)
 
 	svc := make(chan string)
 	go watchServices(b.c, b.cfg.TagPrefix, b.cfg.ServiceStatus, svc)
@@ -85,7 +85,7 @@ func (b *be) WatchServices() chan string {
 }
 
 func (b *be) WatchManual() chan string {
-	mdllog.Info.Printf("[INFO] consul: Watching KV path %q", b.cfg.KVPath)
+	logging.Info("[INFO] consul: Watching KV path %q", b.cfg.KVPath)
 
 	kv := make(chan string)
 	go watchKV(b.c, b.cfg.KVPath, kv)

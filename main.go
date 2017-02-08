@@ -8,7 +8,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
-	"github.com/eBay/fabio/mdllog"
+	"github.com/eBay/fabio/logging"
 	"github.com/eBay/fabio/admin"
 	"github.com/eBay/fabio/config"
 	"github.com/eBay/fabio/exit"
@@ -40,9 +40,9 @@ func main() {
 		fmt.Println(version)
 		return
 	}
-	mdllog.Info.Printf("[INFO] Runtime config\n" + toJSON(cfg))
-	mdllog.Info.Printf("[INFO] Version %s starting", version)
-	mdllog.Info.Printf("[INFO] Go runtime is %s", runtime.Version())
+	logging.Info("[INFO] Runtime config\n" + toJSON(cfg))
+	logging.Info("[INFO] Version %s starting", version)
+	logging.Info("[INFO] Go runtime is %s", runtime.Version())
 
 	exit.Listen(func(s os.Signal) {
 		if registry.Default == nil {
@@ -71,12 +71,12 @@ func newHTTPProxy(cfg *config.Config) http.Handler {
 	if err := route.SetPickerStrategy(cfg.Proxy.Strategy); err != nil {
 		exit.Fatal("[FATAL] ", err)
 	}
-	mdllog.Info.Printf("[INFO] Using routing strategy %q", cfg.Proxy.Strategy)
+	logging.Info("[INFO] Using routing strategy %q", cfg.Proxy.Strategy)
 
 	if err := route.SetMatcher(cfg.Proxy.Matcher); err != nil {
 		exit.Fatal("[FATAL] ", err)
 	}
-	mdllog.Info.Printf("[INFO] Using routing matching %q", cfg.Proxy.Matcher)
+	logging.Info("[INFO] Using routing matching %q", cfg.Proxy.Matcher)
 
 	tr := &http.Transport{
 		ResponseHeaderTimeout: cfg.Proxy.ResponseHeaderTimeout,
@@ -91,7 +91,7 @@ func newHTTPProxy(cfg *config.Config) http.Handler {
 }
 
 func startAdmin(cfg *config.Config) {
-	mdllog.Info.Printf("[INFO] Admin server listening on %q", cfg.UI.Addr)
+	logging.Info("[INFO] Admin server listening on %q", cfg.UI.Addr)
 	go func() {
 		srv := &admin.Server{
 			Color:    cfg.UI.Color,
@@ -108,7 +108,7 @@ func startAdmin(cfg *config.Config) {
 
 func initMetrics(cfg *config.Config) {
 	if cfg.Metrics.Target == "" {
-		mdllog.Info.Printf("[INFO] Metrics disabled")
+		logging.Info("[INFO] Metrics disabled")
 		return
 	}
 
@@ -123,17 +123,17 @@ func initMetrics(cfg *config.Config) {
 
 func initRuntime(cfg *config.Config) {
 	if os.Getenv("GOGC") == "" {
-		mdllog.Info.Print("[INFO] Setting GOGC=", cfg.Runtime.GOGC)
+		logging.Info("[INFO] Setting GOGC=", cfg.Runtime.GOGC)
 		debug.SetGCPercent(cfg.Runtime.GOGC)
 	} else {
-		mdllog.Info.Print("[INFO] Using GOGC=", os.Getenv("GOGC"), " from env")
+		logging.Info("[INFO] Using GOGC=", os.Getenv("GOGC"), " from env")
 	}
 
 	if os.Getenv("GOMAXPROCS") == "" {
-		mdllog.Info.Print("[INFO] Setting GOMAXPROCS=", cfg.Runtime.GOMAXPROCS)
+		logging.Info("[INFO] Setting GOMAXPROCS=", cfg.Runtime.GOMAXPROCS)
 		runtime.GOMAXPROCS(cfg.Runtime.GOMAXPROCS)
 	} else {
-		mdllog.Info.Print("[INFO] Using GOMAXPROCS=", os.Getenv("GOMAXPROCS"), " from env")
+		logging.Info("[INFO] Using GOMAXPROCS=", os.Getenv("GOMAXPROCS"), " from env")
 	}
 }
 
@@ -184,11 +184,11 @@ func watchBackend() {
 
 		t, err := route.NewTable(next)
 		if err != nil {
-			mdllog.Warning.Printf("[WARN] %s", err)
+			logging.Warn("[WARN] %s", err)
 			continue
 		}
 		route.SetTable(t)
-		mdllog.Info.Printf("[INFO] Updated config to\n%s", t)
+		logging.Info("[INFO] Updated config to\n%s", t)
 
 		last = next
 	}

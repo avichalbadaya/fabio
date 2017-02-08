@@ -3,7 +3,7 @@ package metrics
 import (
 	"errors"
 	"fmt"
-	"github.com/eBay/fabio/mdllog"
+	"github.com/eBay/fabio/logging"
 	"os"
 	"sync"
 	"time"
@@ -61,7 +61,7 @@ func circonusRegistry(prefix string, circ config.Circonus, interval time.Duratio
 
 		metrics.Start()
 
-		mdllog.Info.Print("[INFO] Sending metrics to Circonus")
+		logging.Info("[INFO] Sending metrics to Circonus")
 	})
 
 	return circonus, initError

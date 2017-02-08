@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"errors"
-	"github.com/eBay/fabio/mdllog"
+	"github.com/eBay/fabio/logging"
 	"net"
 	"net/http"
 	"strings"
@@ -97,7 +97,7 @@ func addHeaders(r *http.Request, cfg config.Proxy) error {
 func target(r *http.Request) *route.Target {
 	t := route.GetTable().Lookup(r, r.Header.Get("trace"))
 	if t == nil {
-		mdllog.Warning.Print("[WARN] No route for ", r.Host, r.URL)
+		logging.Warn("[WARN] No route for ", r.Host, r.URL)
 	}
 	return t
 }

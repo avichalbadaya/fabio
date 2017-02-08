@@ -198,7 +198,7 @@ func load(cmdline, environ, envprefix []string, props *properties.Properties) (c
 	// handle deprecations
 	// deprecate := func(name, msg string) {
 	// 	if f.IsSet(name) {
-	// 		mdllog.Warning.Print("[WARN] ", msg)
+	// 		logging.Warn("[WARN] ", msg)
 	// 	}
 	// }
 

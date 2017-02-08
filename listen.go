@@ -12,7 +12,7 @@ import (
 	"github.com/eBay/fabio/config"
 	"github.com/eBay/fabio/exit"
 	"github.com/eBay/fabio/proxy"
-	"github.com/eBay/fabio/mdllog"
+	"github.com/eBay/fabio/logging"
 )
 
 var quit = make(chan bool)
@@ -41,13 +41,13 @@ func startListeners(listen []config.Listen, wait time.Duration, h http.Handler, 
 	proxy.Shutdown()
 
 	// trigger graceful shutdown
-	mdllog.Info.Printf("[INFO] Graceful shutdown over %s", wait)
+	logging.Info("[INFO] Graceful shutdown over %s", wait)
 	time.Sleep(wait)
-	mdllog.Info.Print("[INFO] Down")
+	logging.Info("[INFO] Down")
 }
 
 func listenAndServeTCP(l config.Listen, h proxy.TCPProxy) {
-	mdllog.Info.Print("[INFO] TCP+SNI proxy listening on ", l.Addr)
+	logging.Info("[INFO] TCP+SNI proxy listening on ", l.Addr)
 	ln, err := net.Listen("tcp", l.Addr)
 	if err != nil {
 		exit.Fatal("[FATAL] ", err)
@@ -96,12 +96,12 @@ func listenAndServeHTTP(l config.Listen, h http.Handler) {
 	}
 
 	if srv.TLSConfig != nil {
-		mdllog.Info.Printf("[INFO] HTTPS proxy listening on %s", l.Addr)
+		logging.Info("[INFO] HTTPS proxy listening on %s", l.Addr)
 		if srv.TLSConfig.ClientAuth == tls.RequireAndVerifyClientCert {
-			mdllog.Info.Printf("[INFO] Client certificate authentication enabled on %s", l.Addr)
+			logging.Info("[INFO] Client certificate authentication enabled on %s", l.Addr)
 		}
 	} else {
-		mdllog.Info.Printf("[INFO] HTTP proxy listening on %s", l.Addr)
+		logging.Info("[INFO] HTTP proxy listening on %s", l.Addr)
 	}
 
 	if err := serve(srv); err != nil {
