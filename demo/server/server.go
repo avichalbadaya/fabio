@@ -30,7 +30,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"github.com/eBay/fabio/logging"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -75,7 +75,7 @@ func main() {
 		case "ws":
 			http.Handle(p, websocket.Handler(EchoServer))
 		default:
-			logging.Fatal("Invalid protocol ", proto)
+			log.Fatal("Invalid protocol ", proto)
 		}
 	}
 
@@ -95,7 +95,7 @@ func main() {
 			err = http.ListenAndServe(addr, nil)
 		}
 		if err != nil {
-			logging.Fatal(err)
+			log.Fatal(err)
 		}
 	}()
 
@@ -109,11 +109,11 @@ func main() {
 	// get host and port as string/int
 	host, portstr, err := net.SplitHostPort(addr)
 	if err != nil {
-		logging.Fatal(err)
+		log.Fatal(err)
 	}
 	port, err := strconv.Atoi(portstr)
 	if err != nil {
-		logging.Fatal(err)
+		log.Fatal(err)
 	}
 
 	var check *api.AgentServiceCheck
@@ -145,11 +145,11 @@ func main() {
 	config := &api.Config{Address: consul, Scheme: "http", Token: token}
 	client, err := api.NewClient(config)
 	if err != nil {
-		logging.Fatal(err)
+		log.Fatal(err)
 	}
 
 	if err := client.Agent().ServiceRegister(service); err != nil {
-		logging.Fatal(err)
+		log.Fatal(err)
 	}
 	logging.Info("Registered service %q in consul with tags %q", name, strings.Join(tags, ","))
 
@@ -160,7 +160,7 @@ func main() {
 
 	// deregister service
 	if err := client.Agent().ServiceDeregister(serviceID); err != nil {
-		logging.Fatal(err)
+		log.Fatal(err)
 	}
 	logging.Info("Deregistered service %q in consul", name)
 }
