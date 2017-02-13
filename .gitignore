@@ -12,6 +12,5 @@
 .idea
 .vagrant
 build/builds/
-fabio
 fabio.sublime-*
 demo/cert/
